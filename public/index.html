@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                if (new Date().getDay() != 5) {
+                    document.getElementById('friday').style.display = 'none';
+                }
+
+                fetch('calendar')
+                    .then((response) => response.json())
+                    .then((data) => {
+                        const numberMeetings = data.value.length;
+                        document.getElementById('count-meetings').innerHTML = numberMeetings;
+
+                        const COST_PER_HOUR = 56;
+                        var seconds = Math.round(numberMeetings * 0.763 * 3600);
+                        var t0 = Date.now();
+
+                        function updateTime() {
+                            seconds++;
+                            var h = Math.floor(seconds / 3600);
+                            var m = Math.floor((seconds - (h * 3600)) / 60);
+                            var s = seconds - (h * 3600) - (m * 60);
+
+                            m = ("0" + m).slice(-2);
+                            s = ("0" + s).slice(-2);
+
+                            document.getElementById('time').innerHTML = `${h}h <small class="text-muted">${m}m ${s}s</small>`;
+                        }
+
+                        function updateCost() {
+                            // avg people per meeting = 4
+                            // equinox attendants = ~120 approx
+                            const COST_MACBOOK_M1_PRO = 2249;
+                            var cost = (seconds / 3600 * COST_PER_HOUR * 4 + (Date.now() - t0) / 1000 / 3600 * COST_PER_HOUR * 120).toFixed(1);
+                            document.getElementById('cost').innerHTML = cost;
+                            document.getElementById('cost-m1').innerHTML = (cost / COST_MACBOOK_M1_PRO).toFixed(2) + " MacBooks M1 Pro"
+                        }
+
+                        function animate() {
+                            document.getElementById('money-icon').classList.add('fa-shake');
+                            document.getElementById('chema-icon').classList.add('fa-bounce');
+
+                            setTimeout(function() {
+                                document.getElementById('money-icon').classList.remove('fa-shake');
+                                document.getElementById('chema-icon').classList.remove('fa-bounce');
+                            }, 1000);
+                        }
+
+                        setInterval(updateTime, 1000);
+                        setInterval(updateCost, 200);
+                        setInterval(animate, 10000);
+                    });
+            });
+        </script>
+    </head>
+    <body>
+        <section class="main-content">
+            <div>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <div class="stat-card">
+                            <div class="stat-card__content">
+                                <p class="text-uppercase mb-1 text-muted">Meetings this week</p>
+                                <h2 id="count-meetings">-</h2>
+                                <!--
+                                <div>
+                                    <span class="text-danger font-weight-bold mr-1"><i class="fa-solid fa-arrow-down"></i> -4%</span>
+                                    <span class="text-muted">vs last 28 days</span>
+                                </div>
+                                -->
+                            </div>
+                            <div class="stat-card__icon stat-card__icon--primary">
+                                <div class="stat-card__icon-circle">
+                                    <i class="fa-solid fa-skull-crossbones"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <div class="stat-card">
+                            <div class="stat-card__content">
+                                <p class="text-uppercase mb-1 text-muted">Time spent</p>
+                                <h2 id="time">-</small></h2>
+                                <div>
+                                    <span class="text-danger font-weight-bold mr-1"><i class="fa-solid fa-arrow-up"></i> +7%</span>
+                                    <span class="text-muted">vs last 28 days</span>
+                                </div>
+                            </div>
+                            <div class="stat-card__icon stat-card__icon--primary">
+                                <div class="stat-card__icon-circle">
+                                    <i class="fa-solid fa-stopwatch"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <div class="stat-card">
+                            <div class="stat-card__content">
+                                <p class="text-uppercase mb-1 text-muted">Weekly cost</p>
+                                <h2><i class="fa-solid fa-euro"></i><span id="cost">-</span></h2>
+                                <div>
+                                    <span class="text-muted" id="cost-m1">-</span>
+                                </div>
+                            </div>
+                            <div class="stat-card__icon stat-card__icon--danger">
+                                <div class="stat-card__icon-circle">
+                                    <i id="money-icon" class="fa-solid fa-sack-dollar"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" id="friday">
+                    <div class="col-sm-1" style="padding: 0px;">
+                        <center>
+                            <img src="chema.png" width="64px" id="chema-icon" class="fa-solid" />
+                        </center>
+                    </div>
+                    <div class="col-sm-3 my-auto" style="padding: 0px">
+                        <div class="stat-card-transparent">
+                            <div class="stat-card__content">
+                                <p class="text-uppercase mb-1 " style="margin-top: 18px; color: lightgray;">
+                                    Today is <strong><u>Friday</u></strong><br>
+                                    Our meeting-free day
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </body>
+</html>
